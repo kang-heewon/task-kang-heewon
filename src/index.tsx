@@ -1,9 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
+import { Index } from "./pages";
 
 ReactDOM.render(
   <React.StrictMode>
-    <div>Hello World!</div>
+    <Index />
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
