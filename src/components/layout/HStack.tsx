@@ -15,20 +15,25 @@ const VERTICAL_ALIGNMENT_MAP = {
 };
 
 type Props = {
+  width?: string;
   children: ReactNode[];
-  alignment: "stretch" | "top" | "bottom" | "center";
+  alignment?: "stretch" | "top" | "bottom" | "center";
   spacing?: number | "around" | "between";
 };
 
-export function VStack({ children, spacing, alignment = "stretch" }: Props) {
+export function HStack({ children, spacing, alignment = "stretch", width }: Props) {
   return (
     <Box
+      width={width}
       justifyContent={typeof spacing === "string" ? HORIZONTAL_SPACING_MAP[spacing] : undefined}
       alignItems={VERTICAL_ALIGNMENT_MAP[alignment]}
     >
       {children.map((child, index) =>
         typeof spacing === "number" && index !== 0 ? (
-          <Spacing left={spacing}>{child}</Spacing>
+          <React.Fragment key={index}>
+            <Spacing left={spacing}></Spacing>
+            {child}
+          </React.Fragment>
         ) : (
           child
         )
@@ -37,7 +42,10 @@ export function VStack({ children, spacing, alignment = "stretch" }: Props) {
   );
 }
 
-const Box = styled.div<{ justifyContent?: string; alignItems?: string }>`
+const Box = styled.div<{ width?: string; justifyContent?: string; alignItems?: string }>`
+  ${({ width }) => width && `width: ${width};`}
   display: flex;
   flex-direction: row;
+  ${({ justifyContent }) => justifyContent && `justify-content: ${justifyContent};`}
+  ${({ alignItems }) => alignItems && `align-items: ${alignItems};`}
 `;
