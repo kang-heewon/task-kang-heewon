@@ -5,7 +5,7 @@ import { HStack } from "../components/layout/HStack";
 import { VStack } from "../components/layout/VStack";
 import { ColorText } from "../components/typography/ColorText";
 import { Typography } from "../components/typography/Typography";
-import { tooShort } from "../utils/formValidator";
+import { onlyEnglishAndSpace, onlyKorean, tooLong, tooShort } from "../utils/formValidator";
 
 type Props = {
   userNumber: number;
@@ -24,18 +24,30 @@ export function UserInfoView({ userNumber }: Props) {
         <VStack spacing={8} width="100%">
           <Label>영문 이름</Label>
           <TextInput
-            formId={"user_name" + userNumber}
+            formId={"user_english_name" + userNumber}
             placeHolder="Gil dong"
-            onTouchValidate={(value) => tooShort(value, 2)}
+            onTouchValidate={(value) =>
+              onlyEnglishAndSpace(value) ?? tooShort(value, 2) ?? tooLong(value, 20)
+            }
           />
         </VStack>
         <VStack spacing={8} width="100%">
           <Label>영문 성</Label>
-          <TextInput formId={"user_parent_name" + userNumber} />
+          <TextInput
+            formId={"user_english_parent_name" + userNumber}
+            onTouchValidate={(value) =>
+              onlyEnglishAndSpace(value) ?? tooShort(value, 2) ?? tooLong(value, 20)
+            }
+          />
         </VStack>
       </HStack>
-      <TextInput formId="hello" />
-      <TextInput formId="bye" />
+      <VStack spacing={8} width="100%">
+        <Label>한글 이름</Label>
+        <TextInput
+          formId={"user_korean_name" + userNumber}
+          onTouchValidate={(value) => onlyKorean(value) ?? tooShort(value, 2) ?? tooLong(value, 20)}
+        />
+      </VStack>
     </VStack>
   );
 }

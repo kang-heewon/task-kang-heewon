@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import React, { useCallback, useEffect, useState } from "react";
+import { Error } from "../../components/form/Error";
 import { useForm } from "../../contexts/FormContext";
 
 type Props = {
@@ -25,18 +26,21 @@ export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
   }, [formId, localValue, onTouchValidate, setValue]);
 
   return (
-    <Box
-      onChange={handleChange}
-      value={localValue}
-      placeholder={placeHolder}
-      error={Boolean(localError)}
-    />
+    <>
+      <Box
+        onChange={handleChange}
+        value={localValue}
+        placeholder={placeHolder}
+        error={Boolean(localError)}
+      />
+      {localError && <Error>{localError}</Error>}
+    </>
   );
 }
 
 const Box = styled.input<{ error: boolean }>`
   width: 100%;
-  border: solid 1px ${({ error }) => (error ? "#F78000" : "#ced4da")};
+  border: solid ${({ error }) => (error ? "2px #F78000" : "1px #ced4da")};
   appearance: none;
   outline: none;
   height: 40px;
