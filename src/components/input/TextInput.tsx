@@ -1,29 +1,42 @@
 import styled from "@emotion/styled";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "../../contexts/FormContext";
 
-type Props = { formId: string; placeHolder?: string };
+type Props = {
+  formId: string;
+  placeHolder?: string;
+  onTouchValidate?: (value: string) => string | undefined;
+};
 
-export function TextInput({ formId, placeHolder }: Props) {
+export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
   const { getValue, setValue } = useForm();
   const [localValue, setLocalValue] = useState(getValue(formId) ?? "");
+  const [localError, setLocalError] = useState<string>();
+  const handleChange = useCallback((e) => setLocalValue(e.target.value), []);
 
   useEffect(() => {
-    setValue(formId, localValue);
-  }, [formId, localValue, setValue]);
+    if (localValue && onTouchValidate) {
+      const result = onTouchValidate(localValue);
+      setLocalError(result);
+      if (!result) {
+        setValue(formId, localValue);
+      }
+    }
+  }, [formId, localValue, onTouchValidate, setValue]);
 
   return (
     <Box
-      onChange={(e) => setLocalValue(e.target.value)}
+      onChange={handleChange}
       value={localValue}
       placeholder={placeHolder}
+      error={Boolean(localError)}
     />
   );
 }
 
-const Box = styled.input`
+const Box = styled.input<{ error: boolean }>`
   width: 100%;
-  border: solid 1px #ced4da;
+  border: solid 1px ${({ error }) => (error ? "#F78000" : "#ced4da")};
   appearance: none;
   outline: none;
   height: 40px;
@@ -33,8 +46,8 @@ const Box = styled.input`
   font-size: 14px;
 
   :focus {
-    border: 1px solid #2b96ed;
-    box-shadow: inset 0 0 0 1px #51abf3;
+    border: 1px solid ${({ error }) => (error ? "#F78000" : "#2b96ed")};
+    box-shadow: inset 0 0 0 1px ${({ error }) => (error ? "#F78000" : "#51abf3")};
   }
   ::placeholder {
     color: #adb5bd;

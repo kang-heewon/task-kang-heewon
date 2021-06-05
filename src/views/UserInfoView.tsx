@@ -5,6 +5,7 @@ import { HStack } from "../components/layout/HStack";
 import { VStack } from "../components/layout/VStack";
 import { ColorText } from "../components/typography/ColorText";
 import { Typography } from "../components/typography/Typography";
+import { tooShort } from "../utils/formValidator";
 
 type Props = {
   userNumber: number;
@@ -22,7 +23,11 @@ export function UserInfoView({ userNumber }: Props) {
       <HStack spacing={16}>
         <VStack spacing={8} width="100%">
           <Label>영문 이름</Label>
-          <TextInput formId={"user_name" + userNumber} placeHolder="Gil dong" />
+          <TextInput
+            formId={"user_name" + userNumber}
+            placeHolder="Gil dong"
+            onTouchValidate={(value) => tooShort(value, 2)}
+          />
         </VStack>
         <VStack spacing={8} width="100%">
           <Label>영문 성</Label>
