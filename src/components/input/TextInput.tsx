@@ -3,8 +3,8 @@ import { useForm } from "../../contexts/FormContext";
 
 type Props = { formId: string };
 export function TextInput({ formId }: Props) {
-  const { setValue } = useForm();
-  const [localValue, setLocalValue] = useState("");
+  const { getValue, setValue } = useForm();
+  const [localValue, setLocalValue] = useState(getValue(formId) ?? "");
 
   useEffect(() => {
     setValue(formId, localValue);
