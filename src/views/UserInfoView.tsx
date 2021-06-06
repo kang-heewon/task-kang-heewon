@@ -1,12 +1,17 @@
 import React from "react";
 import { Label } from "../components/form/Label";
-import { RadioInput } from "../components/input/RadioInput";
 import { TextInput } from "../components/input/TextInput";
 import { HStack } from "../components/layout/HStack";
 import { VStack } from "../components/layout/VStack";
 import { ColorText } from "../components/typography/ColorText";
 import { Typography } from "../components/typography/Typography";
-import { onlyEnglishAndSpace, onlyKorean, tooLong, tooShort } from "../utils/formValidator";
+import {
+  onlyEnglishAndSpace,
+  onlyKorean,
+  onlyNumber,
+  tooLong,
+  tooShort,
+} from "../utils/formValidator";
 
 type Props = {
   userNumber: number;
@@ -50,10 +55,12 @@ export const UserInfoView = React.memo(({ userNumber }: Props) => {
         />
       </VStack>
       <VStack spacing={8} width="100%">
-        <Label>한글 이름</Label>
-        <RadioInput
+        <Label>생년월일</Label>
+        <TextInput
           formId={"user_korean_name" + userNumber}
-          onTouchValidate={(value) => onlyKorean(value) ?? tooShort(value, 2) ?? tooLong(value, 20)}
+          onTouchValidate={(value) =>
+            onlyNumber(value) ?? tooShort(value, 6, "6자리의 생년월일을 입력해 주세요.(YYMMDD)")
+          }
         />
       </VStack>
     </VStack>

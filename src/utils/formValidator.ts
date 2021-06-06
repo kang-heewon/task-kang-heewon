@@ -1,6 +1,6 @@
-export const tooShort = (value: string, length: number) => {
+export const tooShort = (value: string, length: number, message?: string) => {
   if (value.length < length) {
-    return `최소 ${length}자 이상 입력해주세요.`;
+    return message ?? `최소 ${length}자 이상 입력해주세요.`;
   }
 };
 
@@ -21,6 +21,13 @@ const koreanRegex = /^[ㄱ-ㅎ|가-힣]*$/;
 export const onlyKorean = (value: string) => {
   if (!koreanRegex.test(value)) {
     return `한글만 입력 가능합니다.`;
+  }
+};
+
+const numberRegex = /^[0-9]*$/;
+export const onlyNumber = (value: string) => {
+  if (!numberRegex.test(value)) {
+    return `숫자(0~9)만 입력 가능합니다.`;
   }
 };
 

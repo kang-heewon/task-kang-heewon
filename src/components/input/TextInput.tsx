@@ -18,9 +18,7 @@ export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
   const handleValidate = useCallback(() => {
     if (onTouchValidate) {
       const result = onTouchValidate(localValue);
-      if (result) {
-        setLocalError(result);
-      }
+      setLocalError(result);
       return Boolean(result);
     }
     return false;
@@ -37,14 +35,10 @@ export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
 
   useEffect(() => {
     if (localValue && onTouchValidate) {
-      const result = onTouchValidate(localValue);
-      if (result) {
-        setLocalError(result);
-        return;
-      }
+      handleValidate();
       setValue(formId, localValue);
     }
-  }, [formId, localValue, onTouchValidate, setRef, setValue]);
+  }, [formId, handleValidate, localValue, onTouchValidate, setRef, setValue]);
 
   useEffect(() => {
     if (localError) {
