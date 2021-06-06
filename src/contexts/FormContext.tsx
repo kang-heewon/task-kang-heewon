@@ -1,7 +1,7 @@
 import React, { FormEvent, ReactNode, RefObject, useCallback, useContext, useMemo } from "react";
 
 type FormValue = { [key in string]: string };
-type FormError = { [key in string]: RefObject<HTMLElement> };
+type FormError = { [key in string]: RefObject<HTMLElement> | null };
 
 function FormService(initialValue: FormValue, handleSubmit: (values: FormValue) => void) {
   const values = { ...initialValue };
@@ -15,7 +15,7 @@ function FormService(initialValue: FormValue, handleSubmit: (values: FormValue) 
     values[id] = value;
   };
 
-  const setErrorRef = (id: string, ref: RefObject<HTMLElement>) => {
+  const setErrorRef = (id: string, ref: RefObject<HTMLElement> | null) => {
     errors[id] = ref;
   };
 
@@ -25,13 +25,20 @@ function FormService(initialValue: FormValue, handleSubmit: (values: FormValue) 
       return;
     }
 
-    const topRef = Object.keys(errors).reduce((prevKey, key) => {
-      const targetOffsetTop = errors[key].current?.offsetTop ?? 0;
-      const prevOffsetTop = errors[prevKey].current?.offsetTop ?? 0;
+    const topRef = Object.keys(errors).reduce((prevKey, key, index) => {
+      const targetOffsetTop = errors[key]?.current?.offsetTop;
+      const prevOffsetTop = errors[prevKey]?.current?.offsetTop;
+      if (!targetOffsetTop) {
+        return prevKey;
+      }
+      if (!prevOffsetTop) {
+        return key;
+      }
       return prevOffsetTop > targetOffsetTop ? key : prevKey;
     });
     if (topRef) {
-      errors[topRef].current?.focus();
+      console.log(Object.keys(errors), topRef, errors);
+      errors[topRef]?.current?.focus();
     }
   };
 

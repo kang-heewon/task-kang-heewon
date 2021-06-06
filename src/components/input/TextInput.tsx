@@ -20,11 +20,8 @@ export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
     if (localValue && onTouchValidate) {
       const result = onTouchValidate(localValue);
       setLocalError(result);
-      if (!result) {
-        setValue(formId, localValue);
-      } else {
-        setErrorRef(formId, ref);
-      }
+      setValue(formId, localValue);
+      setErrorRef(formId, result ? ref : null);
     }
   }, [formId, localValue, onTouchValidate, setErrorRef, setValue]);
 
