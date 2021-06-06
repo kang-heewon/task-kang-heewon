@@ -1,9 +1,11 @@
-import React, { FormEvent, ReactNode, useCallback, useContext, useMemo } from "react";
+import React, { FormEvent, ReactNode, RefObject, useCallback, useContext, useMemo } from "react";
 
 type FormValue = { [key in string]: string };
+type FormError = { [key in string]: RefObject<HTMLElement> };
 
 function FormService(initialValue: FormValue, handleSubmit: (values: FormValue) => void) {
   const values = { ...initialValue };
+  const errors: FormError = {};
 
   const getValue = (id: string) => {
     return values[id];
@@ -13,13 +15,30 @@ function FormService(initialValue: FormValue, handleSubmit: (values: FormValue) 
     values[id] = value;
   };
 
+  const setErrorRef = (id: string, ref: RefObject<HTMLElement>) => {
+    errors[id] = ref;
+  };
+
   const submit = () => {
-    handleSubmit(values);
+    if (!errors) {
+      handleSubmit(values);
+      return;
+    }
+
+    const topRef = Object.keys(errors).reduce((prevKey, key) => {
+      const targetOffsetTop = errors[key].current?.offsetTop ?? 0;
+      const prevOffsetTop = errors[prevKey].current?.offsetTop ?? 0;
+      return prevOffsetTop > targetOffsetTop ? key : prevKey;
+    });
+    if (topRef) {
+      errors[topRef].current?.focus();
+    }
   };
 
   return {
     getValue,
     setValue,
+    setErrorRef,
     submit,
   };
 }

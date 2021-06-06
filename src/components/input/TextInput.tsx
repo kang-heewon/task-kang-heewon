@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Error } from "../../components/form/Error";
 import { useForm } from "../../contexts/FormContext";
 
@@ -10,10 +10,11 @@ type Props = {
 };
 
 export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
-  const { getValue, setValue } = useForm();
+  const { getValue, setValue, setErrorRef } = useForm();
   const [localValue, setLocalValue] = useState(getValue(formId) ?? "");
   const [localError, setLocalError] = useState<string>();
   const handleChange = useCallback((e) => setLocalValue(e.target.value), []);
+  const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (localValue && onTouchValidate) {
@@ -21,13 +22,16 @@ export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
       setLocalError(result);
       if (!result) {
         setValue(formId, localValue);
+      } else {
+        setErrorRef(formId, ref);
       }
     }
-  }, [formId, localValue, onTouchValidate, setValue]);
+  }, [formId, localValue, onTouchValidate, setErrorRef, setValue]);
 
   return (
     <>
       <Box
+        ref={ref}
         onChange={handleChange}
         value={localValue}
         placeholder={placeHolder}
