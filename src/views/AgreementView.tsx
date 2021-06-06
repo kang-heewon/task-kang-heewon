@@ -15,7 +15,6 @@ export const AgreementView = React.memo(
       []
     );
     const handleToogleTotalAgree = useCallback(() => {
-      console.log(adsAgree, travlerAgree);
       const total = travlerAgree && adsAgree;
       setTravlerAgree(!total);
       setAdsAgree(!total);

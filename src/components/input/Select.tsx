@@ -44,9 +44,7 @@ export function Select({ formId, placeHolder, items, onTouchValidate, flex }: Pr
   }, [formId, handleValidate, localValue, onTouchValidate, setRef, setValue]);
 
   useEffect(() => {
-    if (localError) {
-      setError(formId, Boolean(localError));
-    }
+    setError(formId, Boolean(localError));
   }, [formId, localError, setError, setRef]);
 
   return (

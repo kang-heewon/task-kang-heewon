@@ -10,7 +10,6 @@ type FormValue = {
 };
 
 function FormService(handleSubmit: (values: FormValue) => void, initialValue?: FormValue) {
-  let rerender = new Date();
   const values: FormValue = { ...initialValue };
 
   const getValue = (id: string) => {
@@ -35,51 +34,54 @@ function FormService(handleSubmit: (values: FormValue) => void, initialValue?: F
     values[id] = { ...values[id], validator };
   };
 
-  const setRerender = () => {
-    rerender = new Date();
-  };
-
-  const validate = (keyList: string[]) => {
-    for (const key of keyList) {
-      values[key].validator?.(values[key].value ?? "");
-    }
-  };
+  const validate = (keyList: string[]) =>
+    new Promise((resolve) => {
+      for (const key of keyList) {
+        values[key].error = values[key].validator?.(values[key].value ?? "");
+      }
+      resolve(keyList.some((key) => values[key].error));
+    });
 
   const getErrors = (keyList: string[]): string =>
-    keyList.reduce((prevKey, key, index) => {
-      const targetOffsetTop = values[key].ref?.current?.offsetTop;
-      const prevOffsetTop = values[prevKey].ref?.current?.offsetTop;
+    keyList
+      .filter((key) => values[key].error)
+      .reduce((prevKey, key) => {
+        const targetOffsetTop = values[key].ref?.current?.offsetTop;
+        const prevOffsetTop = values[prevKey].ref?.current?.offsetTop;
+        console.log(key, prevOffsetTop, targetOffsetTop);
 
-      if (!values[key].error || !targetOffsetTop) {
-        return prevKey;
-      }
+        if (!targetOffsetTop) {
+          return prevKey;
+        }
 
-      if (!values[prevKey].error || !prevOffsetTop) {
-        return key;
-      }
-      return prevOffsetTop > targetOffsetTop ? key : prevKey;
-    });
+        if (!prevOffsetTop) {
+          return key;
+        }
+        return prevOffsetTop > targetOffsetTop ? key : prevKey;
+      });
 
   const submit = async () => {
     const keyList = Object.keys(values);
-    validate(keyList);
-
-    const errorKey = getErrors(keyList);
-
-    if (errorKey) {
-      values[errorKey]?.ref?.current?.focus();
-      return;
+    const hasError = await validate(keyList);
+    if (hasError) {
+      const errorKey = getErrors(keyList);
+      console.log(errorKey);
+      if (errorKey) {
+        values[errorKey]?.ref?.current?.scrollIntoView();
+        window.scrollBy(0, -100);
+        values[errorKey]?.ref?.current?.focus();
+        return;
+      }
     }
+
     handleSubmit(values);
   };
 
   return {
     values,
-    rerender,
     getValue,
     getValueObject,
     setValue,
-    setRerender,
     setError,
     setValidator,
     setRef,

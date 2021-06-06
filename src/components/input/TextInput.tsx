@@ -43,9 +43,7 @@ export function TextInput({ formId, placeHolder, onTouchValidate, flex }: Props)
   }, [formId, handleValidate, localValue, setRef, setValue]);
 
   useEffect(() => {
-    if (localError) {
-      setError(formId, Boolean(localError));
-    }
+    setError(formId, Boolean(localError));
   }, [formId, localError, setError, setRef]);
 
   return (

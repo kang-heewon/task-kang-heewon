@@ -23,7 +23,7 @@ export function UserForm() {
   const decreaseUserCount = useCallback(() => {
     setUserCount((prev) => (prev - 1 === 0 ? 1 : prev - 1));
   }, []);
-  const handleSubmit = useCallback((values) => console.log(values), []);
+  const handleSubmit = useCallback(() => alert("예약이 완료 되었습니다."), []);
 
   return (
     <Container>

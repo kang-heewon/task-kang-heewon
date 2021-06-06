@@ -43,14 +43,12 @@ export function RadioInput({ formId, onTouchValidate, items, flex }: Props) {
   }, [formId, handleValidate, localValue, setRef, setValue]);
 
   useEffect(() => {
-    if (localError) {
-      setError(formId, Boolean(localError));
-    }
+    setError(formId, Boolean(localError));
   }, [formId, localError, setError, setRef]);
 
   return (
     <VStack spacing={4} width="100%" flex={flex}>
-      <Box>
+      <Box ref={ref}>
         <HStack width="100%" spacing="between">
           {items.map((item, index) => (
             <HStack key={item.value} width="100%">
