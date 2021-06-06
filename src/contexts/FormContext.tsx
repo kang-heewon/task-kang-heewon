@@ -1,57 +1,82 @@
 import React, { FormEvent, ReactNode, RefObject, useCallback, useContext, useMemo } from "react";
 
-type FormValue = { [key in string]: string };
-type FormError = { [key in string]: RefObject<HTMLElement> | null };
+type FormValue = {
+  [key in string]: {
+    value?: string;
+    ref?: RefObject<HTMLElement>;
+    error?: boolean;
+    validator?: (value: string) => boolean;
+  };
+};
 
-function FormService(initialValue: FormValue, handleSubmit: (values: FormValue) => void) {
-  const values = { ...initialValue };
-  const errors: FormError = {};
+function FormService(handleSubmit: (values: FormValue) => void, initialValue?: FormValue) {
+  const values: FormValue = { ...initialValue };
 
   const getValue = (id: string) => {
-    return values[id];
+    return values[id]?.value;
   };
 
   const setValue = (id: string, value: string) => {
-    values[id] = value;
+    values[id] = { ...values[id], value };
   };
 
-  const setErrorRef = (id: string, ref: RefObject<HTMLElement> | null) => {
-    errors[id] = ref;
+  const setRef = (id: string, ref: RefObject<HTMLElement>) => {
+    values[id] = { ...values[id], ref };
+  };
+  const setError = (id: string, error: boolean) => {
+    values[id] = { ...values[id], error };
   };
 
-  const submit = () => {
-    if (!errors) {
-      handleSubmit(values);
+  const setValidator = (id: string, validator: (value: string) => boolean) => {
+    values[id] = { ...values[id], validator };
+  };
+
+  const validate = (keyList: string[]) =>
+    new Promise(() => {
+      keyList.forEach((key) => values[key].validator?.(values[key].value ?? ""));
+    });
+
+  const getErrors = (keyList: string[]): Promise<string> =>
+    new Promise(() =>
+      keyList.reduce((prevKey, key) => {
+        const targetOffsetTop = values[key].ref?.current?.offsetTop;
+        const prevOffsetTop = values[prevKey].ref?.current?.offsetTop;
+
+        if (!values[key].error || !targetOffsetTop) {
+          return prevKey;
+        }
+
+        if (!values[prevKey].error || !prevOffsetTop) {
+          return key;
+        }
+        return prevOffsetTop > targetOffsetTop ? key : prevKey;
+      })
+    );
+
+  const submit = async () => {
+    const keyList = Object.keys(values);
+    await validate(keyList);
+    const errorKey = await getErrors(keyList);
+
+    if (errorKey) {
+      values[errorKey]?.ref?.current?.focus();
       return;
     }
-
-    const topRef = Object.keys(errors).reduce((prevKey, key, index) => {
-      const targetOffsetTop = errors[key]?.current?.offsetTop;
-      const prevOffsetTop = errors[prevKey]?.current?.offsetTop;
-      if (!targetOffsetTop) {
-        return prevKey;
-      }
-      if (!prevOffsetTop) {
-        return key;
-      }
-      return prevOffsetTop > targetOffsetTop ? key : prevKey;
-    });
-    if (topRef) {
-      console.log(Object.keys(errors), topRef, errors);
-      errors[topRef]?.current?.focus();
-    }
+    handleSubmit(values);
   };
 
   return {
     getValue,
     setValue,
-    setErrorRef,
+    setError,
+    setValidator,
+    setRef,
     submit,
   };
 }
 
 type Props = {
-  initialValues: FormValue;
+  initialValues?: FormValue;
   onSubmit: (values: FormValue) => void;
   children: ReactNode;
 };
@@ -60,7 +85,7 @@ export const FormContext = React.createContext<ReturnType<typeof FormService>>(n
 
 export function FormProvider({ initialValues, onSubmit, children }: Props) {
   const formService = useMemo(
-    () => FormService(initialValues, onSubmit),
+    () => FormService(onSubmit, initialValues),
     [initialValues, onSubmit]
   );
 

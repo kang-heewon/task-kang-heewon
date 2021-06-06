@@ -10,20 +10,47 @@ type Props = {
 };
 
 export function TextInput({ formId, placeHolder, onTouchValidate }: Props) {
-  const { getValue, setValue, setErrorRef } = useForm();
+  const { getValue, setValue, setRef, setError, setValidator } = useForm();
   const [localValue, setLocalValue] = useState(getValue(formId) ?? "");
   const [localError, setLocalError] = useState<string>();
   const handleChange = useCallback((e) => setLocalValue(e.target.value), []);
   const ref = useRef<HTMLInputElement>(null);
+  const handleValidate = useCallback(() => {
+    if (onTouchValidate) {
+      const result = onTouchValidate(localValue);
+      if (result) {
+        setLocalError(result);
+      }
+      return Boolean(result);
+    }
+    return false;
+  }, [localValue, onTouchValidate]);
+
+  useEffect(() => {
+    if (ref.current) {
+      setRef(formId, ref);
+    }
+    if (handleValidate) {
+      setValidator(formId, handleValidate);
+    }
+  }, [formId, handleValidate, onTouchValidate, setRef, setValidator]);
 
   useEffect(() => {
     if (localValue && onTouchValidate) {
       const result = onTouchValidate(localValue);
-      setLocalError(result);
+      if (result) {
+        setLocalError(result);
+        return;
+      }
       setValue(formId, localValue);
-      setErrorRef(formId, result ? ref : null);
     }
-  }, [formId, localValue, onTouchValidate, setErrorRef, setValue]);
+  }, [formId, localValue, onTouchValidate, setRef, setValue]);
+
+  useEffect(() => {
+    if (localError) {
+      setError(formId, Boolean(localError));
+    }
+  }, [formId, localError, setError, setRef]);
 
   return (
     <>

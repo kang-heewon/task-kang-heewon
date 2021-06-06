@@ -26,7 +26,7 @@ export function UserForm() {
   return (
     <Container>
       <Spacing top={24} />
-      <FormProvider initialValues={{ name: "helo" }} onSubmit={handleSubmit}>
+      <FormProvider onSubmit={handleSubmit}>
         <VStack spacing={38}>
           {generateSizeArray(userCount).map((_, index) => (
             <React.Fragment key={index}>
@@ -36,15 +36,18 @@ export function UserForm() {
               <Divider />
             </React.Fragment>
           ))}
-          <ArriveInfoView />
-          <Spacing bottom={24} />
-          <Divider />
-          <PhoneInfoView />
-          <Spacing bottom={24} />
-          <Divider />
-          <OtherArriveInfoView />
-          <Spacing bottom={24} />
-          <Divider />
+          <VStack spacing={24}>
+            <ArriveInfoView />
+            <Divider />
+          </VStack>
+          <VStack spacing={24}>
+            <PhoneInfoView />
+            <Divider />
+          </VStack>
+          <VStack spacing={24}>
+            <OtherArriveInfoView />
+            <Divider />
+          </VStack>
           <HStack spacing={4}>
             <Button kind="primary" onClick={increaseUserCount}>
               사용자 추가

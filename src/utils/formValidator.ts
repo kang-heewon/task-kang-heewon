@@ -23,3 +23,9 @@ export const onlyKorean = (value: string) => {
     return `한글만 입력 가능합니다.`;
   }
 };
+
+export const requiredSelect = (value: string, label: string) => {
+  if (!value) {
+    return `${label}을 선택해주세요.`;
+  }
+};
