@@ -1,3 +1,9 @@
+export const exactLength = (value: string, length: number, message?: string) => {
+  if (value.length !== length) {
+    return message ?? `${length}자리로 입력해주세요.`;
+  }
+};
+
 export const tooShort = (value: string, length: number, message?: string) => {
   if (value.length < length) {
     return message ?? `최소 ${length}자 이상 입력해주세요.`;

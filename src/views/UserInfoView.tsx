@@ -7,6 +7,7 @@ import { VStack } from "../components/layout/VStack";
 import { ColorText } from "../components/typography/ColorText";
 import { Typography } from "../components/typography/Typography";
 import {
+  exactLength,
   onlyEnglishAndSpace,
   onlyKorean,
   onlyNumber,
@@ -76,7 +77,7 @@ export const UserInfoView = React.memo(({ userNumber }: Props) => {
           formId={"user_birth_date" + userNumber}
           placeHolder="YYMMDD"
           onTouchValidate={(value) =>
-            onlyNumber(value) ?? tooShort(value, 6, "6자리의 생년월일을 입력해 주세요.(YYMMDD)")
+            onlyNumber(value) ?? exactLength(value, 6, "6자리의 생년월일을 입력해 주세요.(YYMMDD)")
           }
         />
       </VStack>
