@@ -2,21 +2,25 @@ import React, { FormEvent, ReactNode, RefObject, useCallback, useContext, useMem
 
 type FormValue = {
   [key in string]: {
-    value?: string;
+    value?: any;
     ref?: RefObject<HTMLElement>;
     error?: boolean;
-    validator?: (value: string) => boolean;
+    validator?: (value: any) => boolean;
   };
 };
 
 function FormService(handleSubmit: (values: FormValue) => void, initialValue?: FormValue) {
+  let rerender = new Date();
   const values: FormValue = { ...initialValue };
 
   const getValue = (id: string) => {
     return values[id]?.value;
   };
+  const getValueObject = (id: string) => {
+    return values[id];
+  };
 
-  const setValue = (id: string, value: string) => {
+  const setValue = (id: string, value: any) => {
     values[id] = { ...values[id], value };
   };
 
@@ -27,36 +31,40 @@ function FormService(handleSubmit: (values: FormValue) => void, initialValue?: F
     values[id] = { ...values[id], error };
   };
 
-  const setValidator = (id: string, validator: (value: string) => boolean) => {
+  const setValidator = (id: string, validator: (value: any) => boolean) => {
     values[id] = { ...values[id], validator };
   };
 
-  const validate = (keyList: string[]) =>
-    new Promise(() => {
-      keyList.forEach((key) => values[key].validator?.(values[key].value ?? ""));
+  const setRerender = () => {
+    rerender = new Date();
+  };
+
+  const validate = (keyList: string[]) => {
+    for (const key of keyList) {
+      values[key].validator?.(values[key].value ?? "");
+    }
+  };
+
+  const getErrors = (keyList: string[]): string =>
+    keyList.reduce((prevKey, key, index) => {
+      const targetOffsetTop = values[key].ref?.current?.offsetTop;
+      const prevOffsetTop = values[prevKey].ref?.current?.offsetTop;
+
+      if (!values[key].error || !targetOffsetTop) {
+        return prevKey;
+      }
+
+      if (!values[prevKey].error || !prevOffsetTop) {
+        return key;
+      }
+      return prevOffsetTop > targetOffsetTop ? key : prevKey;
     });
-
-  const getErrors = (keyList: string[]): Promise<string> =>
-    new Promise(() =>
-      keyList.reduce((prevKey, key) => {
-        const targetOffsetTop = values[key].ref?.current?.offsetTop;
-        const prevOffsetTop = values[prevKey].ref?.current?.offsetTop;
-
-        if (!values[key].error || !targetOffsetTop) {
-          return prevKey;
-        }
-
-        if (!values[prevKey].error || !prevOffsetTop) {
-          return key;
-        }
-        return prevOffsetTop > targetOffsetTop ? key : prevKey;
-      })
-    );
 
   const submit = async () => {
     const keyList = Object.keys(values);
-    await validate(keyList);
-    const errorKey = await getErrors(keyList);
+    validate(keyList);
+
+    const errorKey = getErrors(keyList);
 
     if (errorKey) {
       values[errorKey]?.ref?.current?.focus();
@@ -66,8 +74,12 @@ function FormService(handleSubmit: (values: FormValue) => void, initialValue?: F
   };
 
   return {
+    values,
+    rerender,
     getValue,
+    getValueObject,
     setValue,
+    setRerender,
     setError,
     setValidator,
     setRef,

@@ -19,14 +19,16 @@ type Props = {
   children: ReactNode[];
   alignment?: "stretch" | "top" | "bottom" | "center";
   spacing?: number | "around" | "between";
+  flex?: number;
 };
 
-export function VStack({ children, spacing, alignment = "stretch", width }: Props) {
+export function VStack({ children, spacing, alignment = "stretch", width, flex }: Props) {
   return (
     <Box
       width={width}
       justifyContent={typeof spacing === "string" ? VERTICAL_SPACING_MAP[spacing] : undefined}
       alignItems={HORIZONTAL_ALIGNMENT_MAP[alignment]}
+      flex={flex}
     >
       {children.map((child, index) =>
         typeof spacing === "number" && index !== 0 ? (
@@ -42,10 +44,16 @@ export function VStack({ children, spacing, alignment = "stretch", width }: Prop
   );
 }
 
-const Box = styled.div<{ width?: string; justifyContent?: string; alignItems?: string }>`
+const Box = styled.div<{
+  width?: string;
+  justifyContent?: string;
+  alignItems?: string;
+  flex?: number;
+}>`
   ${({ width }) => width && `width: ${width};`}
   display: flex;
   flex-direction: column;
   ${({ justifyContent }) => justifyContent && `justify-content: ${justifyContent};`}
   ${({ alignItems }) => alignItems && `align-items: ${alignItems};`}
+  ${({ flex }) => flex && `flex: ${flex};`}
 `;

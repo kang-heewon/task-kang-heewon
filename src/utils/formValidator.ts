@@ -31,6 +31,12 @@ export const onlyNumber = (value: string) => {
   }
 };
 
+export const requiredInput = (value: string, label: string) => {
+  if (!value) {
+    return `${label}를 입력해주세요.`;
+  }
+};
+
 export const requiredSelect = (value: string, label: string) => {
   if (!value) {
     return `${label}을 선택해주세요.`;

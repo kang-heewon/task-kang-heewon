@@ -7,6 +7,7 @@ import { Spacing } from "../components/layout/Spacing";
 import { VStack } from "../components/layout/VStack";
 import { FormProvider } from "../contexts/FormContext";
 import { generateSizeArray } from "../utils/generateSizeArray";
+import { AgreementView } from "../views/AgreementView";
 import { ArriveInfoView } from "../views/ArriveInfoView";
 import { OtherArriveInfoView } from "../views/OtherArriveInfoView";
 import { PhoneInfoView } from "../views/PhoneInfoView";
@@ -14,6 +15,7 @@ import { UserInfoView } from "../views/UserInfoView";
 
 export function UserForm() {
   const [userCount, setUserCount] = useState(1);
+  const [canSubmit, setCanSubmit] = useState(false);
 
   const increaseUserCount = useCallback(() => {
     setUserCount((prev) => prev + 1);
@@ -48,6 +50,10 @@ export function UserForm() {
             <OtherArriveInfoView />
             <Divider />
           </VStack>
+          <VStack spacing={24}>
+            <AgreementView setCanSubmit={setCanSubmit} />
+            <Divider />
+          </VStack>
           <HStack spacing={4}>
             <Button kind="primary" onClick={increaseUserCount}>
               사용자 추가
@@ -56,7 +62,7 @@ export function UserForm() {
               사용자 삭제
             </Button>
           </HStack>
-          <Button kind="primary" type="submit">
+          <Button kind="primary" type="submit" disabled={!canSubmit}>
             결제하기
           </Button>
         </VStack>

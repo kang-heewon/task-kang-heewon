@@ -11,12 +11,12 @@ type Props = {
   flex?: number;
 };
 
-export function TextInput({ formId, placeHolder, onTouchValidate, flex }: Props) {
+export function TextArea({ formId, placeHolder, onTouchValidate, flex }: Props) {
   const { getValue, setValue, setRef, setError, setValidator } = useForm();
   const [localValue, setLocalValue] = useState(getValue(formId) ?? "");
   const [localError, setLocalError] = useState<string>();
   const handleChange = useCallback((e) => setLocalValue(e.target.value), []);
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLTextAreaElement>(null);
   const handleValidate = useCallback(() => {
     if (onTouchValidate) {
       const result = onTouchValidate(localValue);
@@ -62,16 +62,15 @@ export function TextInput({ formId, placeHolder, onTouchValidate, flex }: Props)
   );
 }
 
-const Box = styled.input<{ error: boolean }>`
+const Box = styled.textarea<{ error: boolean }>`
   width: 100%;
   border: solid ${({ error }) => (error ? "2px #F78000" : "1px #ced4da")};
   appearance: none;
   outline: none;
-  height: 40px;
-  margin-top: 0;
-  padding: 0 12px;
+  padding: 12px;
   border-radius: 4px;
   font-size: 14px;
+  min-height: 100px;
 
   :focus {
     border: 1px solid ${({ error }) => (error ? "#F78000" : "#2b96ed")};

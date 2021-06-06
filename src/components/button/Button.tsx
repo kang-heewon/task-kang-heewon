@@ -71,4 +71,10 @@ const Box = styled.button<{
     box-shadow: 0 0 0 3px ${({ focusShadowColor }) => focusShadowColor};
     outline: none;
   }
+  :disabled {
+    color: -internal-light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
+    background-color: ${({ focusShadowColor }) => focusShadowColor};
+    border-color: ${({ focusShadowColor }) => focusShadowColor};
+    cursor: not-allowed;
+  }
 `;
